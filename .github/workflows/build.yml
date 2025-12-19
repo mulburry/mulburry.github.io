@@ -20,7 +20,9 @@ jobs:
               run: |
                 mkdir -p public
                 for md in $(find docs -name '*.md'); do
-                    html=public/${md%.md}.html
+                    html=public/${md#docs/}          # ① 去掉 docs/
+                    html=${html%.md}.html            # ② 改后缀
+                    # html=public/${md%.md}.html
                     mkdir -p $(dirname $html)
                     pandoc "$md" \
                         --template=.github/pandoc-template.html \
