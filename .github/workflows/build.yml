@@ -26,7 +26,6 @@ jobs:
                         --template=.github/pandoc-template.html \
                         --css=/theme/github-markdown.css \
                         --css=/theme/custom.css \
-                        --highlight-style=github \
                         --filter mermaid-filter \
                         -o "$html"
                 done
