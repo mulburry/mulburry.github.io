@@ -1,0 +1,40 @@
+name: md -> web pages
+
+on:
+    push:
+        branches: [ main ]
+permissions:
+    contents: write
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: setup pandoc & theme
+              run: |
+                sudo apt-get update && sudo apt-get install -y pandoc
+                npm install -g github-markdown-css highlight.js mermaid-filter
+
+            - name: convert
+              run: |
+                mkdir -p public
+                for md in $(find docs -name '*.md'); do
+                    html=public/${md%.md}.html
+                    mkdir -p $(dirname $html)
+                    pandoc "$md" \
+                        --template=.github/pandoc-template.html \
+                        --css=/theme/github.css \
+                        --css=/theme/custom.css \
+                        --highlight-style=github \
+                        --filter mermaid-filter \
+                        -o "$html"
+                done
+                # 把静态资源也拷进去
+                cp -r theme public/
+
+            - name: deploy
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                publish_dir: ./public
